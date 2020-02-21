@@ -17,11 +17,11 @@
         <form action="Myservlet" method="get">
             <input type="submit" value="submit using GET"/>
         </form>
-        
+
         <br>
         <form action="Myservlet" method="post">
             <input type="submit" value="submit using POST"/>
         </form>
 
-</body>
+    </body>
 </html>
