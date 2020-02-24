@@ -79,7 +79,8 @@
                                 </tr>
                                 <tr>
                                     <td>Enter your Password</td>
-                                    <td><input type="password" name="password" class="form-control"/></td>
+                                    <td><input type="password" name="password" class="form-control" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"/></br>
+                                    <span><b>Password should be minimum 8 char and contains one Upper, one Lowe, one Special and one digit</b></span></td>
                                 </tr>
                                 <tr>
                                     <td>Retype Password</td>

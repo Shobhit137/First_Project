@@ -13,6 +13,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.*;
+import java.util.Base64;
+import javax.servlet.RequestDispatcher;
+import org.apache.commons.lang.*;
+
 
 public class UserData extends HttpServlet {
 
@@ -54,7 +58,9 @@ public class UserData extends HttpServlet {
         
         //response.sendRedirect("register.jsp");
         if(op!=null && op.equalsIgnoreCase("add")) {
-        String name = request.getParameter("name");
+       // String name = StringEscapeUtils.escapeHtml(request.getParameter("name"));
+        //String fname=StringEscapeUtils.escapeHtml(request.getParameter("fname"));
+        String name=request.getParameter("name");
         String fname =request.getParameter("fname");
         String dob = request.getParameter("dob");
         String gender = request.getParameter("gender");
@@ -123,8 +129,8 @@ public class UserData extends HttpServlet {
          String op = request.getParameter("op");
         
     if(op!=null && op.equalsIgnoreCase("add")) {
-        String name = request.getParameter("name");
-        String fname =request.getParameter("fname");
+        String name =StringEscapeUtils.escapeHtml(request.getParameter("name"));
+        String fname =StringEscapeUtils.escapeHtml(request.getParameter("fname"));
         String dob = request.getParameter("dob");
         String gender = request.getParameter("gender");
         String user_id=request.getParameter("user_id");
@@ -158,6 +164,7 @@ public class UserData extends HttpServlet {
         
         Connection con=null;
         PreparedStatement smt=null;
+          String encodedPassword =  Base64.getEncoder().encodeToString(password.getBytes("UTF-8"));
         try{
             Class.forName("com.mysql.jdbc.Driver");
             con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gisttraining","root","123456");
@@ -169,7 +176,7 @@ public class UserData extends HttpServlet {
             smt.setString(4, gender);
             smt.setString(5, hbs);
             smt.setString(6,user_id);
-            smt.setString(7, password);
+             smt.setString(7, encodedPassword);
            // smt.setString(8, rpassword);
             //execute the command : executeUpdate()-for insert,update and delete or executeQuery()-for select
 
@@ -226,9 +233,42 @@ public class UserData extends HttpServlet {
             
         }catch(Exception e){
             System.out.println("Error : + "+ e.getMessage());
-        
-        }
+           if(e.getMessage().contains("Duplicate")){
+            out.println("<font color='red' size='5' face='corbel'> the Userid you entered is not available</font>");
+            out.println("<hr/>");
+                RequestDispatcher rd= request.getRequestDispatcher("register.jsp");
+                rd.include(request, response);
+           }
+        }}
+         if(op!=null && op.equalsIgnoreCase("login")){
+        String user_id=request.getParameter("user_id");
+        String password = request.getParameter("password");
+        Connection con =null;
+        PreparedStatement smt = null;
+        String encodedpassword = Base64.getEncoder().encodeToString(password.getBytes("UTF-8"));
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gisttraining","root","123456");
+            String sql ="select * from user where user_id=? and password=?";
+            smt = con.prepareStatement(sql);
+            smt.setString(1, user_id);
+            smt.setString(2, encodedpassword);
+            
+            ResultSet rs = smt.executeQuery();
          
+            if(rs.next()){
+                response.sendRedirect("welcome.jsp?name="+rs.getString("name"));
+            }
+            else 
+                response.sendRedirect("login.jsp?msg=Invalid Userid or Password");
+            
+              con.close();
+            smt.close();
+            
+                 
+        }catch(Exception e){
+            System.out.println("Error " + e.getMessage());
+        }
     }}}
     
    

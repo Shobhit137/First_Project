@@ -57,7 +57,8 @@
                 <td><%=rs.getString("dob")%></td>
                 <td><%=rs.getString("gender")%></td>
                 <td><%=rs.getString("hobbies")%></td>
-                <td><a href="edit.jsp?id=<%=rs.getString("id")%> " class="btn btn-success">Edit  </a>  ||  <a href="UserData?op=delete&id=<%=rs.getString("id")%>"class="btn btn-danger" onclick="return confirmation()" >Delete</a></td>
+                <td><a href="edit.jsp?id=<%=rs.getString("id")%> " class="btn btn-success"><i class="fa fa-pencil" aria-hidden="true"></i>Edit
+                          </a>  ||  <a href="UserData?op=delete&id=<%=rs.getString("id")%>"class="btn btn-danger" onclick="return confirmation()" ><i class="fa fa-trash" aria-hidden="true"></i>Delete</a></td>
             </tr>
             <%}
 
@@ -70,7 +71,7 @@
 
         </table>
         <br/>
-        <a href="Register1.jsp" class="btn btn-primary">Add More Records</a>
+        <a href="Register1.jsp" class="btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i>Add More Records</a>
     </center>
 </body>
 </html>
