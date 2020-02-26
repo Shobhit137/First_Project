@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 package first.packag;
-
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
@@ -16,6 +16,16 @@ import java.sql.*;
 import java.util.Base64;
 import javax.servlet.RequestDispatcher;
 import org.apache.commons.lang.*;
+import java.util.ArrayList;
+
+
+import java.util.Iterator;
+import java.util.List;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 
 public class UserData extends HttpServlet {
@@ -53,9 +63,65 @@ public class UserData extends HttpServlet {
         }catch(Exception e){
             System.out.println("Error : + "+ e.getMessage());
         
-        } 
         }
-        
+        }
+          if (op != null && op.equals("varify")) {
+            String user_id = request.getParameter("user_id");
+            if (user_id == null || user_id.equals("")) {
+                out.print("<b> Plese fillout the userid</b>");
+                return;
+            }
+            Connection con = null;
+            PreparedStatement smt = null;
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gisttraining", "root", "123456");
+                String sql = "select * from user where user_id=?";
+                smt = con.prepareStatement(sql);
+                smt.setString(1, user_id);
+                //execute the command : executeUpdate()-for insert,update and delete or executeQuery()-for select
+                ResultSet rs = smt.executeQuery();
+                if (rs.next()) {
+                    out.println("<font color='red' size='4' face='corbel'>Sorry! this userid is not available</font>");
+                } else {
+                    out.println("<font color='blue' size='4' face='corbel'> Congrats! this userid is available!</font>");
+                }
+                smt.close();
+                con.close();
+
+            } catch (Exception e) {
+                System.out.println("Error :  "+ e.getMessage());
+
+            }
+        }
+         if(op!=null && op.equalsIgnoreCase("search"))
+        {
+            Connection con=null;
+            PreparedStatement smt=null;
+            String course=request.getParameter("s1");
+            try{
+            Class.forName("com.mysql.jdbc.Driver");
+            con=DriverManager.getConnection("jdbc:mysql://localhost:3306/gisttraining","root","123456");
+            
+            String sql="select * from course where id in(select course_id from src where subject_id=?)";
+            smt=con.prepareStatement(sql);
+            smt.setString(1, course);
+            ResultSet rs=smt.executeQuery();
+            
+            
+            String output="<tr class=\"text-light bg-dark\"><td value='-1'>Course</td></tr>";
+            while(rs.next())
+            {
+                output+="<tr><td value=='"+rs.getString(1)+"'>"+rs.getString(2)+"</td></tr>";
+            }
+            out.println(output);
+            con.close();
+            smt.close();
+        }catch(Exception e)
+        {
+            System.out.println("Error"+e.getMessage());
+        }
+        }
         //response.sendRedirect("register.jsp");
         if(op!=null && op.equalsIgnoreCase("add")) {
        // String name = StringEscapeUtils.escapeHtml(request.getParameter("name"));
@@ -71,7 +137,7 @@ public class UserData extends HttpServlet {
         //        + "dob : " + dob + "<br/>gender : " + gender +"<br/>Hobbies : <br/>");
         
         for (String h : hobbies){
-              hbs +=  h ;
+              hbs +=  h +",";
         }
             //out.println("<li>"+ h +"</li>");
          
@@ -128,69 +194,135 @@ public class UserData extends HttpServlet {
         
          String op = request.getParameter("op");
         
-    if(op!=null && op.equalsIgnoreCase("add")) {
-        String name =StringEscapeUtils.escapeHtml(request.getParameter("name"));
-        String fname =StringEscapeUtils.escapeHtml(request.getParameter("fname"));
-        String dob = request.getParameter("dob");
-        String gender = request.getParameter("gender");
-        String user_id=request.getParameter("user_id");
-        String password=request.getParameter("password");
-       // String rpassword=request.getParameter("rpassword");
-        String hobbies[] = request.getParameterValues("hobbies");
-        String hbs="";
-        //Rending the Information that has been received ..
-      //  out.println("Name : "+ name +"<br/> Fname " + fname + "<br/>"
-        //        + "dob : " + dob + "<br/>gender : " + gender +"<br/>Hobbies : <br/>");
-        
-        for (String h : hobbies){
-              hbs +=  h ;
-        }
-            //out.println("<li>"+ h +"</li>");
-         
-        /*
-        Enumeration form=request.getParameterNames();
-        while(form.hasMoreElements())
-        {
-            String name=(String)form.nextElement();
-            String values[]=request.getParameterValues(name);
-            out.println(name+" : ");
-            
-            for(String s:values)
-                out.println(s+"<br/>"); 
-        }*/
-        
-        
-        // JDBC Code
-        
-        Connection con=null;
-        PreparedStatement smt=null;
-          String encodedPassword =  Base64.getEncoder().encodeToString(password.getBytes("UTF-8"));
-        try{
-            Class.forName("com.mysql.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gisttraining","root","123456");
-            String sql = "Insert into user(name,fname,dob,gender,hobbies,user_id,password) values(?,?,?,?,?,?,?)";
-            smt = con.prepareStatement(sql);
-            smt.setString(1, name);
-            smt.setString(2, fname);
-            smt.setString(3, dob);
-            smt.setString(4, gender);
-            smt.setString(5, hbs);
-            smt.setString(6,user_id);
-             smt.setString(7, encodedPassword);
-           // smt.setString(8, rpassword);
-            //execute the command : executeUpdate()-for insert,update and delete or executeQuery()-for select
+   if (op != null && op.equals("add")) {
 
-            int n = smt.executeUpdate();
-            smt.close();
-            con.close();
+            //check the enctype of the incomming request -
+            boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+               String name ="";
+               String fname="";
+               String dob="";
+               String gender ="";
+               String userid="";
+               String password="";
+               String hobbies[]=null;
+               String photo="";
+               String imagePath="";
+               String hbs="";
+               String encodedPassword="";
+               List<String> checkboxlist = new ArrayList();
+               
+            if (!isMultipart) {
+                 name = StringEscapeUtils.escapeHtml(request.getParameter("name"));
+                  fname = StringEscapeUtils.escapeHtml(request.getParameter("fname"));
+                  dob = request.getParameter("dob");
+                  gender = request.getParameter("gender");
+                  userid = request.getParameter("userid");
+                  password = request.getParameter("password");
+                  hobbies = request.getParameterValues("hobbies");
+                  photo = request.getParameter("photo");
+                  hbs = "";
+                //Rending the Information that has been received ..
+                //  out.println("Name : "+ name +"<br/> Fname " + fname + "<br/>"
+                //          + "dob : " + dob + "<br/>gender : " + gender +"<br/>Hobbies : <br/>");
 
-            if (n>0)
-                response.sendRedirect("view.jsp");
-        }catch(Exception e)
-        {
-           System.out.println("Error : + "+ e.getMessage());
-        }
-    }
+                for (String h : hobbies) {
+                    hbs += h + ",";
+                } 
+                
+            }
+             else {
+                FileItemFactory factory = new DiskFileItemFactory();
+                ServletFileUpload upload = new ServletFileUpload(factory);
+                List items = null;
+                try {
+                    items = upload.parseRequest(request);
+                } catch (FileUploadException e) {
+                    e.getMessage();
+                }
+
+                Iterator itr = items.iterator();
+                while (itr.hasNext()) {
+                    FileItem item = (FileItem) itr.next();
+                    if (item.isFormField()) {
+                        String fieldName = item.getFieldName();
+                        String fieldValue = item.getString();
+                        if (fieldName.equals("name"))  
+                            name = fieldValue;
+                        else if (fieldName.equals("fname"))  
+                            fname = fieldValue;
+                         else if (fieldName.equals("dob"))  
+                            dob = fieldValue;
+                        else if(fieldName.equals("userid")) 
+                            userid = fieldValue;
+                        else if (fieldName.equals("password"))
+                            password = fieldValue;
+                        else if(fieldName.equals("gender"))
+                            gender=fieldValue;
+                        else if (fieldName.equals("hobbies"))
+                            checkboxlist.add(fieldValue);
+                        
+                    } else {
+                        try {
+                            photo = item.getName();
+                            imagePath = "Media/user/" + photo ;
+                            File savedFile = new File(getServletContext().getRealPath("/") + imagePath);
+                            item.write(savedFile);
+                        } catch (Exception e) {
+                            out.println("Error  " + e.getMessage());
+                        }
+                    }
+                    
+                    hbs="";
+                    for(String s : checkboxlist)
+                        hbs += s +",";
+                }
+            }
+
+                //=============================================//
+                
+
+                //JDBC Code 
+                Connection con = null;
+                PreparedStatement smt = null;
+                encodedPassword = Base64.getEncoder().encodeToString(password.getBytes("UTF-8"));
+                try {
+                     
+                    Class.forName("com.mysql.jdbc.Driver");
+                    con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gisttraining", "root", "123456");
+                    System.out.println("1111111111111111111111111"); 
+                    String sql = "Insert into user(name,fname,dob,gender,hobbies,user_id,password,photo) values(?,?,?,?,?,?,?,?)";
+                    smt = con.prepareStatement(sql);
+                    smt.setString(1, name);
+                    smt.setString(2, fname);
+                    smt.setString(3, dob);
+                    smt.setString(4, gender);
+                    smt.setString(5, hbs);
+                    smt.setString(6, userid);
+                    smt.setString(7, encodedPassword);
+                    smt.setString(8, imagePath);
+                    //execute the command : executeUpdate()-for insert,update and delete or executeQuery()-for select
+                          out.println("x");
+                    int n = smt.executeUpdate();
+                   out.println("x");
+                    smt.close();
+                    con.close();
+                    if (n > 0) //out.println("Data Inserted to table ...");
+                    {
+                        response.sendRedirect("view.jsp");
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("Error : + " + e.getMessage());
+//                    if (e.getMessage().contains("Duplicate")) {
+//                        out.println("<font color='red' size='5' face='corbel'> the Userid you entered is not available</font>");
+//                        out.println("<hr/>");
+//                        RequestDispatcher rd = request.getRequestDispatcher("Register1.jsp");
+//                        rd.include(request, response);
+//                    }
+
+                }
+            }
+
        if (op!=null && op.equalsIgnoreCase("update")){
         int id = Integer.parseInt(request.getParameter("id"));
         
@@ -233,12 +365,12 @@ public class UserData extends HttpServlet {
             
         }catch(Exception e){
             System.out.println("Error : + "+ e.getMessage());
-           if(e.getMessage().contains("Duplicate")){
-            out.println("<font color='red' size='5' face='corbel'> the Userid you entered is not available</font>");
-            out.println("<hr/>");
-                RequestDispatcher rd= request.getRequestDispatcher("register.jsp");
-                rd.include(request, response);
-           }
+//           if(e.getMessage().contains("Duplicate")){
+//            out.println("<font color='red' size='5' face='corbel'> the Userid you entered is not available</font>");
+//            out.println("<hr/>");
+//                RequestDispatcher rd= request.getRequestDispatcher("Register1.jsp");
+//                rd.include(request, response);
+//           }
         }}
          if(op!=null && op.equalsIgnoreCase("login")){
         String user_id=request.getParameter("user_id");
@@ -269,7 +401,10 @@ public class UserData extends HttpServlet {
         }catch(Exception e){
             System.out.println("Error " + e.getMessage());
         }
-    }}}
+    }
+       
+    }
+}
     
    
 

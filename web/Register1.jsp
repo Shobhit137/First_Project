@@ -11,7 +11,6 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
         <jsp:include page="base.jsp"></jsp:include>
-    </head>
     <script type="text/javascript">
         function checkAccept(x, y)
         {
@@ -51,23 +50,57 @@
             result = result && comparePassword(form.password.value, form.rpassword.value);
             return result;
         }
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                   pic.src= e.target.result;
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+//        function varifyUserid(x,y)
+//        {
+//            x1=new XMLHttpRequest();
+//            x1.open("GET","UserData?op=varify&user_id="+x,true);
+//            x1.send();
+//            x1.onreadystatechange=function(){
+//                if(this.readyState==4 && this.status==200)
+//                {
+//                    y.innerHtml=this.responseText;
+//                }
+//            };
+//        }
     </script>
+       <style>
+                img{
+  max-width:180px;
+}
+input[type=file]{
+padding:10px;
+background:#2d2d2d;}
+            </style>
+
+        </head>
+
     <body>
         <div class="container">
             <div class="row">
                 <div class="col col-md-10">
 
 
-                    <form action="UserData?op=add" method="post" class="form" name="regForm" onsubmit="return validateRegistrationForm(regForm);"> 
+                    <form enctype="multipart/form-data" action="UserControl?op=add" method="post" class="form" name="regForm" onsubmit="return validateRegistrationForm(regForm);"> 
                         <center>
                             <h2 class="bg-light">Registration page </h2>
                             <table class="table bg-light"> 
                                 <tr>
                                     <td>Enter your Name </td>
-                                    <td><input type="text" name="name" required="required" autocomplete="off"/> </td>
+                                    <td><input type="text" name="name" required="required" autocomplete="off" class="form-control"/> </td>
                                 </tr> <tr>
                                     <td>Enter your Father's Name </td>
-                                    <td><input type="text" name="fname" required="required"/> </td>
+                                    <td><input type="text" name="fname" required="required" class="form-control"/> </td>
                                 </tr>
                                 <tr>
                                     <td>Enter your DOB </td>
@@ -75,11 +108,13 @@
                                 </tr>
                                 <tr>
                                     <td>Enter your User_id</td>
-                                    <td><input type="email" required="required" name="user_id" class="form-control"/></td>
+                                    <td><input type="email" required="required" name="user_id" class="form-control" /></br>
+                                        <span id="s12"></span>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Enter your Password</td>
-                                    <td><input type="password" name="password" class="form-control" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"/></br>
+                                    <td><input type="password" name="password" class="form-control"/></br>
                                     <span><b>Password should be minimum 8 char and contains one Upper, one Lowe, one Special and one digit</b></span></td>
                                 </tr>
                                 <tr>
@@ -99,6 +134,12 @@
                                     <input type="checkbox" name="hobbies" value="Cooking"/>Cooking
                                     <input type="checkbox" name="hobbies" value="Drawing"/>Drawing
                                 </td>
+                                </tr>
+                                <tr>
+                                    <td>Select your file images</td>
+                                    <td>
+                                         <img src="assets/Images/nophoto.png" style="width:200px;height: 200px" class="img" id="pic"/><br/>
+                                        <input type="file" name="photo" id="photoInput" class="form-control" onchange="readURL(this)"/></td>
                                 </tr>
                                 <tr>
                                     <th colspan="2">

@@ -28,16 +28,18 @@
         <body>
         <center>
             <h2>list of Users</h2>
-            <table border="2" width="100%" cellspacing="0">
+            <table border="5" width="100" cellspacing="1" class="table bg-light" cellpadding="2">
                 <tr>
-
                     <th>ID</th>
                     <th>Name</th>
                     <th>Father's Name</th>
+                    <th>User Id</th>
                     <th>DOB</th>
                     <th>Gender</th>
                     <th>Hobbies</th>
+                    <th>Photo</th>
                     <th>Operations</th>
+                    <th>
                 </tr>
             <%
                 Connection con = null;
@@ -54,9 +56,12 @@
                 <td><%=rs.getString("id")%></td>
                 <td><%=rs.getString("name")%></td>
                 <td><%=rs.getString("fname")%></td>
+                 <td><%=rs.getString("user_id")%></td>
                 <td><%=rs.getString("dob")%></td>
                 <td><%=rs.getString("gender")%></td>
                 <td><%=rs.getString("hobbies")%></td>
+                <td><%=rs.getString("photo")%></td>
+                <td><img src="<%=rs.getString("photo")%>" style="width:60px; height:60px;" class="img img-thumbnail"></td>
                 <td><a href="edit.jsp?id=<%=rs.getString("id")%> " class="btn btn-success"><i class="fa fa-pencil" aria-hidden="true"></i>Edit
                           </a>  ||  <a href="UserData?op=delete&id=<%=rs.getString("id")%>"class="btn btn-danger" onclick="return confirmation()" ><i class="fa fa-trash" aria-hidden="true"></i>Delete</a></td>
             </tr>
@@ -65,7 +70,7 @@
                     con.close();
                     smt.close();
                 } catch (Exception e) {
-                    System.out.println("Error " + e.getMessage());
+                    System.out.println("Error:" + e.getMessage());
                 }
             %>
 

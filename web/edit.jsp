@@ -11,6 +11,19 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
         <jsp:include page="base.jsp"></jsp:include>
+        <script type="text/javascript">
+            function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                   pic.src= e.target.result;
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+          </script>  
         </head>
         <body>
 
@@ -30,13 +43,17 @@
                 ResultSet rs = smt.executeQuery();
                 if (rs.next()) {%>
 
-        <form action="UserData?op=update&id=<%=rs.getString("id")%>" method="post"> 
+                <form action="UserControl?op=update&id=<%=rs.getString("id")%>&pic=<%=rs.getString("photo")%>" method="post" class="form" enctype="multipart/form-data"> 
             <center>
                 <h2> Update User's Data </h2>
-                <table width="600"> 
+                <table width="800"  border="2" bgcolor="rgb(127,127,227)" height="500"> 
                     <tr>
                         <td>Name </td>
                         <td><input type="text" name="name" required="required" autocomplete="off" value="<%=rs.getString("name")%>"/> </td>
+                        <td rowspan="2">
+                            <img src="<%=rs.getString("photo")%>" class="img img-thumbnail" style="width:200px; height:200px" id="pic"/></br>
+                            Change profile<input type="file" name="photo" onchange="readURL(this);"/>
+                        </td>
                     </tr> <tr>
                         <td>Father's Name </td>
                         <td><input type="text" name="fname" required="required" value="<%=rs.getString("fname")%>"/> </td>

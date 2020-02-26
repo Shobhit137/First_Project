@@ -12,6 +12,14 @@
         <servlet-name>SubjectController</servlet-name>
         <servlet-class>first.packag.SubjectController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UserController</servlet-name>
+        <servlet-class>first.packag.UserController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UserControl</servlet-name>
+        <servlet-class>UserControl</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Myservlet</servlet-name>
         <url-pattern>/Myservlet</url-pattern>
@@ -23,6 +31,14 @@
     <servlet-mapping>
         <servlet-name>SubjectController</servlet-name>
         <url-pattern>/SubjectController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserController</servlet-name>
+        <url-pattern>/UserController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserControl</servlet-name>
+        <url-pattern>/UserControl</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
