@@ -26,6 +26,14 @@
             </script>
         </head>
         <body>
+        <%!
+            int start=0;
+            int end=3;
+            int total=0;
+            %>
+<!--            <div class="container">
+                <div class="row">
+                    <div class="col col-md-12">-->
         <center>
             <h2>list of Users</h2>
             <table border="5" width="100" cellspacing="1" class="table bg-light" cellpadding="2">
@@ -42,15 +50,31 @@
                     <th>
                 </tr>
             <%
+               if(request.getParameter("start")!=null)
+                 start=Integer.parseInt(request.getParameter("start"));
+                
                 Connection con = null;
                 PreparedStatement smt;
 
                 try {
                     Class.forName("com.mysql.jdbc.Driver");
                     con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gisttraining", "root", "123456");
-                    String sql = "select * from user";
+                    //String sql="select *from user";
+                   String sql="select count(*) from user";
+                    smt=con.prepareStatement(sql);
+                    ResultSet rs=smt.executeQuery(sql);
+                    if(rs.next())
+                     total=rs.getInt(1);
+                    
+                    
+                    sql = "select * from user limit ?,?";
+                   
                     smt = con.prepareStatement(sql);
-                    ResultSet rs = smt.executeQuery();
+                   
+                   smt.setInt(1, start);
+                   smt.setInt(2, end);
+                    rs = smt.executeQuery();
+                    
                     while (rs.next()) {%>
             <tr>
                 <td><%=rs.getString("id")%></td>
@@ -63,7 +87,7 @@
                 <td><%=rs.getString("photo")%></td>
                 <td><img src="<%=rs.getString("photo")%>" style="width:60px; height:60px;" class="img img-thumbnail"></td>
                 <td><a href="edit.jsp?id=<%=rs.getString("id")%> " class="btn btn-success"><i class="fa fa-pencil" aria-hidden="true"></i>Edit
-                          </a>  ||  <a href="UserData?op=delete&id=<%=rs.getString("id")%>"class="btn btn-danger" onclick="return confirmation()" ><i class="fa fa-trash" aria-hidden="true"></i>Delete</a></td>
+                          </a>  ||  <a href="UserData?op=delete&id=<%=rs.getString("id")%>" class="btn btn-danger" onclick="return confirmation()" ><i class="fa fa-trash" aria-hidden="true"></i>Delete</a></td>
             </tr>
             <%}
 
@@ -75,8 +99,21 @@
             %>
 
         </table>
-        <br/>
+            <span>
+                <center>
+                <a href="view.jsp?start=<%=start-end%>"class="btn btn-primary <%if(start==0)out.println("disabled");%>" style="float:left;">Prev</a>
+                <a href="view.jsp?start=<%=start+end%>" class="btn btn-primary <%if(total-start<=end)out.println("disabled");%>" style="float:right;">Next</a>
+                <%for(int i=0;i<=total/end;i++){%>
+                <a href="view.jsp?start=<%=i*end%>" class="btn btn-success <%if(i==Math.floor(start/end))out.println("btn-dark");%>">Page<%=i+1%></a>
+                 <%}%>
+                 </center>
+            </span>
+                 <br>  
+        <br/><br/>
         <a href="Register1.jsp" class="btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i>Add More Records</a>
     </center>
+<!--</div>
+</div>
+</div>-->
 </body>
 </html>

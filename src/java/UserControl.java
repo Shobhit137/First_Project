@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Iterator;
@@ -26,6 +27,40 @@ public class UserControl extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+         PrintWriter out = response.getWriter();
+        response.setContentType("text/html");
+        String op=request.getParameter("op");
+        if (op != null && op.equals("varify")) {
+            String userid = request.getParameter("user_id");
+            if (userid == null || userid.equals("")) {
+                out.print("<b> Plese fillout the userid</b>");
+                return;
+            }
+            out.println("Hello There");
+            Connection con = null;
+            PreparedStatement smt = null;
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gisttraining", "root", "123456");
+                String sql = "select * from user where user_id=?";
+                smt = con.prepareStatement(sql);
+                smt.setString(1, userid);
+                //execute the command : executeUpdate()-for insert,update and delete or executeQuery()-for select
+                ResultSet rs = smt.executeQuery();
+                if (rs.next()) {
+                    out.println("<font color='red' size='4' face='corbel'>Sorry! this userid is not available</font>");
+                } else {
+                    out.println("<font color='blue' size='4' face='corbel'> Congrats! this userid is available!</font>");
+                }
+                smt.close();
+                con.close();
+
+            } catch (Exception e) {
+                System.out.println("Error : + " + e.getMessage());
+
+            }
+        }
+
     }
 
     @Override
@@ -141,7 +176,7 @@ public class UserControl extends HttpServlet {
                 smt.setString(7, encodedPassword);
                 System.out.println(imagePath);
                 smt.setString(8, imagePath);
-                out.println("Hello");
+               // out.println("Hello");
                 //execute the command : executeUpdate()-for insert,update and delete or executeQuery()-for select
 
                 int n = smt.executeUpdate();
@@ -288,6 +323,35 @@ public class UserControl extends HttpServlet {
             }
 
         }
+         if (op != null && op.equalsIgnoreCase("login")) {
+                String user_id = request.getParameter("user_id");
+                String password = request.getParameter("password");
+                Connection con = null;
+                PreparedStatement smt = null;
+                String encodedpassword = Base64.getEncoder().encodeToString(password.getBytes("UTF-8"));
+                try {
+                    Class.forName("com.mysql.jdbc.Driver");
+                    con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gisttraining", "root", "123456");
+                    String sql = "select * from user where user_id=? and password=?";
+                    smt = con.prepareStatement(sql);
+                    smt.setString(1, user_id);
+                    smt.setString(2, encodedpassword);
+
+                    ResultSet rs = smt.executeQuery();
+
+                    if (rs.next()) {
+                        response.sendRedirect("welcome.jsp?name=" + rs.getString("name"));
+                    } else {
+                        response.sendRedirect("Admin.jsp?msg=Invalid Userid or Password");
+                    }
+
+                    con.close();
+                    smt.close();
+
+                } catch (Exception e) {
+                    System.out.println("Error " + e.getMessage());
+                }
+            }
     }
 
 }

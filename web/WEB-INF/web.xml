@@ -20,6 +20,10 @@
         <servlet-name>UserControl</servlet-name>
         <servlet-class>UserControl</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>beans</servlet-name>
+        <servlet-class>com.beans</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Myservlet</servlet-name>
         <url-pattern>/Myservlet</url-pattern>
@@ -39,6 +43,10 @@
     <servlet-mapping>
         <servlet-name>UserControl</servlet-name>
         <url-pattern>/UserControl</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>beans</servlet-name>
+        <url-pattern>/beans</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

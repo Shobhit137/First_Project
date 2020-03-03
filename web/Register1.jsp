@@ -61,18 +61,18 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
-//        function varifyUserid(x,y)
-//        {
-//            x1=new XMLHttpRequest();
-//            x1.open("GET","UserData?op=varify&user_id="+x,true);
-//            x1.send();
-//            x1.onreadystatechange=function(){
-//                if(this.readyState==4 && this.status==200)
-//                {
-//                    y.innerHtml=this.responseText;
-//                }
-//            };
-//        }
+        function varifyUserid(x,y)
+        {
+            x1=new XMLHttpRequest();
+            x1.open("GET","UserControl?op=varify&user_id="+x,true);
+            x1.send();
+            x1.onreadystatechange=function(){
+                if(this.readyState==4 && this.status==200)
+                {
+                    y.innerHtml=this.responseText;
+                }
+            };
+        }
     </script>
        <style>
                 img{
